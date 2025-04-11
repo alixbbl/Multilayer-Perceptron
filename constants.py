@@ -1,12 +1,9 @@
-YES = 'Yes'
-NO = 'No'
-
 FULL = "FULL"
 RELEVANT = "RELEVANT"
 
-INDEX_NAME = "Nucleus ID"
+INDEX_NAME = "ID"
 COLUMNS_NAMES = [
-                'Nucleus ID',       # Id
+                'ID',       # Id
                 'Diagnosis',        # Diagnostic (M = maligne, B = bénigne)
                 # 1. Radius
                 'Mean Radius',
@@ -51,12 +48,6 @@ COLUMNS_NAMES = [
 ]
 
 TARGET = "Diagnosis"
-RELEVANT_FEATURES = [
-                'Worst Area',
-                'Worst Smoothness',
-                'Mean Texture',
-]
-
 TEST_TRAIN_SPLIT_PARAMS = {
                 'test_size' : 0.25,
                 'random_state' : 42,
@@ -64,8 +55,6 @@ TEST_TRAIN_SPLIT_PARAMS = {
 }
 
 OUTPUT_FILENAMES = [
-                "X_train.csv",
-                "X_test.csv",
-                "y_train.csv",
-                "y_test.csv",
+                "Xy_train.csv",
+                "Xy_test.csv",
 ]

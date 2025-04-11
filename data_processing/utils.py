@@ -46,5 +46,5 @@ def write_output_dataset(dataset: pd.DataFrame, filename: str)-> None:
     """
     output_file = filename
     with open(output_file, mode='w', newline='') as file:
-        dataset.to_csv(filename, index=True)
+        dataset.to_csv(filename, index=False)
     print(f"{output_file} is printed!")
