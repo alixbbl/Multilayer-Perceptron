@@ -82,31 +82,29 @@ class dataProcesser():
                 to_drop.add(feature2)
         to_keep -= to_drop
         self.relevant_features = [ele for ele in to_keep]
-
         print(f"These are the features relevant for training phase :\n {self.relevant_features}")
 
     # Utilisation de apply() qui permet de calculer colonne a colonne sans boucle for
-    def ft_standardize_data(self, X_train: pd.DataFrame) -> Tuple[pd.Series, pd.Series, pd.DataFrame]:
+    def ft_standardize_data(self, df: pd.DataFrame) -> Tuple[pd.Series, pd.Series, pd.DataFrame]:
         """"
-            This functions takes a matrix and returns a tuple of calculated elements : 
-            the matrix std and mean, and the standardized matrix to operate. 
+        This functions takes a matrix and returns a tuple of calculated elements : 
+        the matrix std and mean, and the standardized matrix to operate. 
         """
-        X_train_std = X_train.std() # on applique la fonction a chaque colonne et retourne une Serie des std de chaque colonne
-        X_train_mean = X_train.mean() # idem avec les moyennes de chaque col. apply() agir comme une boucle for
-        training_data_standardized = (X_train - X_train_mean) / X_train_std
-        return (X_train_std, X_train_mean, training_data_standardized)
+        df_std = df.std() # on applique la fonction a chaque colonne et retourne une Serie des std de chaque colonne
+        df_mean = df.mean() # idem avec les moyennes de chaque col. apply() agir comme une boucle for
+        data_standardized = (df - df_mean) / df_std
+        return (df_std, df_mean, data_standardized)
     
     def ft_train_test_split(self, y_feat: str) -> None:
         """
-        This function splits the relevant dataset into two unequal parts used 
-        for training and testing the model.
-        Works randomly. Saves X_train, X_test, y_train, y_test dataframes as CSV files.
+        This function splits the relevant dataset into two unequal parts used for training and testing the model.
+        Works randomly. Saves Xy_train and Xy_test dataframes as CSV files.
         """
         dataset = self.clean_df[self.relevant_features]
 
         np.random.seed(self.random_state)
         data_size = len(dataset)
-        test_size = int(data_size * self.test_size)
+        test_size = int(data_size * self.test_size) # on recupere 25% de la data globale pour le data de test
 
         if self.shuffle:
             indices = np.random.permutation(data_size)
@@ -115,25 +113,25 @@ class dataProcesser():
 
         test_indices = indices[:test_size]
         train_indices = indices[test_size:]
-        X_train = dataset.iloc[train_indices, :-1]
-        y_train = dataset.iloc[train_indices, -1]
-        X_test = dataset.iloc[test_indices, :-1]
-        y_test = dataset.iloc[test_indices, -1]
+        Xy_train = dataset.iloc[train_indices, :-1]
+        Xy_test = dataset.iloc[test_indices, :-1]
 
-        Xy_train = pd.concat([X_train, y_train], axis=1)
-        X_train_std, X_train_mean, Xy_train_stand = self.ft_standardize_data(Xy_train)
-
-        Xy_test = pd.concat([X_test, y_test], axis=1)
-        Xy_test = Xy_test.drop(columns=TARGET)
-        write_output_dataset(Xy_train_stand, OUTPUT_FILENAMES[0])
-        write_output_dataset(Xy_test, OUTPUT_FILENAMES[1])
-        
+        Xy_train_target = Xy_train["Diagnosis"]
+        Xy_train.drop('Diagnosis', axis=1, inplace=True) 
+        Xy_train_std, Xy_train_mean, Xy_train_stand = self.ft_standardize_data(Xy_train)
+        Xy_train_stand = pd.concat([Xy_train, Xy_train_target], axis=1, ignore_index=False)
         standard_const_df = pd.DataFrame({
-            "Mean": X_train_mean,
-            "Std": X_train_std
+            "Mean": Xy_train_mean,
+            "Std": Xy_train_std
         })
         write_output_dataset(standard_const_df, "constants_stand.csv")
 
+        Xy_test = Xy_test.drop(columns=TARGET)
+        # print(Xy_train.head())
+        # print(Xy_test.head())
+        write_output_dataset(Xy_train_stand, OUTPUT_FILENAMES[0])
+        write_output_dataset(Xy_test, OUTPUT_FILENAMES[1])
+        
         print("Data has been split and saved as Xy_train.csv and Xy_test.csv.")
 
 
@@ -146,7 +144,6 @@ def main(parsed_args):
         # data_processer.ft_visualize_data() # a remettre pour le projet push
         data_processer.ft_select_relevant_features()
         data_processer.ft_train_test_split(TARGET)
-
     except KeyboardInterrupt:
         print("\nOh, you just press CTRL+C... Ciao !")
 
@@ -161,4 +158,4 @@ if __name__ == "__main__":
 
 # TO DO 
 # Erreur due a la standardization de XTrain mais qui contient encore B ou M => a changer
-# faire les tests pour voir si les deux datasets crrees et les features sont OK 
+# faire les tests pour voir si les deux datasets crees et les features sont OK 
