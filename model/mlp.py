@@ -21,7 +21,7 @@ X, y = create_data(100, 3)
 plt.scatter(X[:,0], X[:,1])
 plt.show()
 
-# ****************************************** MULTILAYER PERCEPTRON *****************************************
+# **************************************** LAYERS, ACTIVATION & LOSS **************************************
 
 np.random.seed(0)
 
@@ -78,7 +78,29 @@ class Loss_CategoricalCrossEntropy(Loss):
         negative_likelihoods = -np.log(correct_confidences)
         return negative_likelihoods
 
-# **************************************************** MAIN **************************************************
+# ****************************************** GRADIENT OPTIMIZATION *****************************************
+
+# ajouter le suivi de la loss pour la partie graphique de la consigne
+class Optimizer:
+    def __init__(self, learning_rate=0.01):
+        self.learning_rate = learning_rate
+        
+    def update_weights(self, weights, gradient):
+        weights -= self.learning_rate * gradient
+        return weights
+    
+
+# ****************************************** MULTILAYER PERCEPTRON *****************************************
+
+class MLP:
+    def __init__(self): # choix des n_neurons et n_inputs ici
+        pass
+    def backward_propagation(self):
+        pass
+    def feed_forward(self):
+        pass
+
+# **************************************************** MAIN *************************************************
 
 X, y = create_data(100, 3) # on a ici 100 points et 3 classes, donc 300 echantillons
 
