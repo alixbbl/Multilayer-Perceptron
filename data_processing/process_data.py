@@ -49,8 +49,7 @@ class dataProcesser():
 
     def ft_visualize_data(self)-> None:
         """
-        This functions helps visualize and understand the use of data, after printing a 
-        correlation matrix.
+        This functions helps visualize and understand the use of data, after printing a correlation matrix.
         """
         while True:
             visu_choice = input("Enter a data visualization mode 'FULL' or 'RELEVANT':\n ")
@@ -121,31 +120,30 @@ class dataProcesser():
         Xy_train_std, Xy_train_mean, Xy_train_stand = self.ft_standardize_data(Xy_train)
         Xy_train_stand = pd.concat([Xy_train, Xy_train_target], axis=1, ignore_index=False)
         standard_const_df = pd.DataFrame({
-            "Mean": Xy_train_mean,
-            "Std": Xy_train_std
+                                            "Mean": Xy_train_mean,
+                                            "Std": Xy_train_std
         })
         write_output_dataset(standard_const_df, "constants_stand.csv")
-
-        Xy_test = Xy_test.drop(columns=TARGET)
-        # print(Xy_train.head())
-        # print(Xy_test.head())
         write_output_dataset(Xy_train_stand, OUTPUT_FILENAMES[0])
         write_output_dataset(Xy_test, OUTPUT_FILENAMES[1])
         
-        print("Data has been split and saved as Xy_train.csv and Xy_test.csv.")
+        print("Data has been split and saved in Xy_train.csv and Xy_test.csv.")
 
 
 # **************************** MAIN *******************************
 
 def main(parsed_args):
+    
     try:
         data=upload_csv(parsed_args.path_csv_to_read)        
         data_processer = dataProcesser(data)
         # data_processer.ft_visualize_data() # a remettre pour le projet push
         data_processer.ft_select_relevant_features()
         data_processer.ft_train_test_split(TARGET)
+    
     except KeyboardInterrupt:
         print("\nOh, you just press CTRL+C... Ciao !")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -155,7 +153,3 @@ if __name__ == "__main__":
                         help="""CSV file to read""")
     parsed_args=parser.parse_args()
     main(parsed_args)
-
-# TO DO 
-# Erreur due a la standardization de XTrain mais qui contient encore B ou M => a changer
-# faire les tests pour voir si les deux datasets crees et les features sont OK 

@@ -1,3 +1,9 @@
+from pathlib import Path
+
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("output")
+XY_TRAIN_PATH = DATA_DIR / "Xy_train.csv"
+
 FULL = "FULL"
 RELEVANT = "RELEVANT"
 

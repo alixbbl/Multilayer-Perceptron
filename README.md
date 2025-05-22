@@ -1,13 +1,13 @@
-# MULTILAYER PERCEPTRON
+# MULTILAYER PERCEPTRON : DE QUOI ON PARLE ?
 
 👉 POUR REACTIVER LE VIRTUAL ENV :
-    'python3 -m venv env'
-    'source env/bin/activate'
-    'pip install -r requirements.txt'
+    `python3 -m venv env`
+    `source env/bin/activate`
+    `pip install -r requirements.txt`
 
 👉 POUR LANCER LA PREPARATION DES DONNEES :
-    'python -m data_processing.process_data'
 Depuis la racine du projet.
+`python -m data_processing.process_data`
 
 ## Definition et concepts-clefs
 
@@ -16,36 +16,35 @@ Un multilayer perceptron est un reseau de neurones artificiel possedant au moins
 - couche intermediaire ou cachee,
 - couche de sortie.
 Chaque couche possede un nombre variable de neurones, qui se transmettent les informations de la couche 
-d'entree vers la couche de sortie, soit en feedforward. Ce modele a ete invente en 1957 par Franck 
+d'entree vers la couche de sortie, soit en "feedforward". Ce modele a ete invente en 1957 par Franck 
 Rosenblatt - le perceptron etait lors de son invention, monocouche.
 Il est performant pour modeliser les reations entre les donnees lineaires et non-lineaires.
 
 # Feedforward (propagation avant)
 
-💡 L’info entre dans le réseau, traverse les couches, et on obtient une prédiction.
+💡 L’info entre dans le réseau, traverse les couches, on obtient ine fine une prédiction.
 
 À chaque couche :
-
-    On fait un produit matriciel + un biais → Z = W·X + b
-    On applique une fonction d’activation (ex : sigmoid, relu, softmax)
+- On fait un produit matriciel + un biais → Z = W·X + b, soit Predictions = Poids x Inputs + biais
+- On applique ensuite une fonction d’activation (ex : sigmoid, relu, softmax) pour convertir les resultats en 
+- format interpretable (comme des pourcentages).
 
 # Calcul de la perte (loss) ou fonction de cout
 
 Une fois qu’on a la prédiction, on la compare à la valeur réelle (la vérité terrain) pour calculer l’erreur, avec une fonction de coût :
-
-    En classification binaire : log loss (ou binary cross-entropy)
-    En multi-classes : categorical cross-entropy
+- En classification binaire : log loss (ou binary cross-entropy),
+- En multi-classes : categorical cross-entropy.
 
 # Backpropagation (propagation arrière)
 
-Objectif : ajuster les poids du réseau pour qu’il s’améliore.
+Objectif : ajuster les poids du réseau pour qu’il s’améliore de facon iterative.
 
 Il faut donc :
 
-1- Calculer l’erreur finale
+1- Calculer l’erreur finale a chaque tour de predictions,
 2- Puis propager cette erreur en sens inverse dans le réseau pour :
-    - calculer les gradients (pentes de la fonction de coût par rapport aux poids)
-    - mettre à jour les poids avec la descente de gradient
+    - calculer les gradients (pentes de la fonction de coût par rapport aux poids),
+    - mettre à jour les poids avec la descente de gradient.
 
 👉 Cette étape utilise la dérivée des fonctions d’activation (ex: dérivée de sigmoid, softmax…).
 
@@ -68,17 +67,14 @@ Il faut donc :
 
 # PREMIERE ETAPE : CREATION DU DATASET DE TEST
 
-Exemple de fonctions pour creer son propre dataset de classification
-points = le nombre de points de donnees a generer pour chaque classe
-classes = la nombre de classes qu'on veut
 On doit dns un premier temps nettoyer et separer le dataset fourni en deux parties, l'une pour entrainer le modele, la seconde pour le tester.
-Usuellement on utilisera plutot train_test_split(), interdite ici.
+Usuellement on utilisera plutot train_test_split() de la lib sklearn, interdite ici.
  
 
 # IMPLEMENTER LE MULTILAYER PERCEPTRON
 
-La regle la plus importante ici est de s'assurer qu'on a toujours un nombre d'inputs de la couche n, egal au nombre de neurones de la couche n-1, sauf evidemment dans le cadre de l'input layer.
-On initialise les weights au hasard mais en fixant des petites valeurs entre -1 et 1 pour s'assurer de la stabilite mathematiques du calcul.
+La regle la plus importante est de s'assurer qu'on a toujours un nombre d'inputs de la couche n, egal au nombre de neurones de la couche n-1, sauf evidemment dans le cadre de l'input layer.
+On initialise les weights au hasard mais en fixant des petites valeurs entre -1 et 1 pour garantir une plus grande stabilite mathematiques du calcul.
 n_inputs sera le nombre de features et n_neurons le nombre de neurones de la couche
 => Utiliser pn.randn pour produire des valeurs random (utiliser une seed).
 
@@ -170,3 +166,24 @@ La sélection avec l'indexation avancée récupère les valeurs [0.6, 0.3, 0.2],
 # OPTIMISATION DE LA LOSS => TRAINING DU MODELE MLP
 
 Entrée brute -> Prédictions brutes -> Softmax -> Probabilités -> Calcul de la Loss -> Backpropagation
+
+📦 Comment on différencie les types de couches :
+
+Input layer	: Reçoit les données d'entrée
+=> Pas de transformation spéciale, elle est souvent juste une DenseLayer(n_inputs, ...).
+
+Hidden layers : Apprennent les représentations
+=> DenseLayer(..., n_neurons) suivies d'activations comme ReLU ou sigmoid.
+
+Output layer : Donne les prédictions finales
+=> DenseLayer(..., n_classes) suivie d'activation Softmax (pour classification) ou sigmoid (pour binaire).
+
+En pseudo-code simplifie on aurait ceci : 
+`for epoch in range(n_epochs):`
+    `output = mlp.feed_forward(X)`
+    `loss = loss_function.compute_loss(output, y)`
+    `mlp.backward(y)`
+    `optimizer.step(mlp.layers)`
+Une epoch correspond a un passage complet du dataset de train dans le reseau. 
+On va diviser le dataset de training en unites dites "batchs".
+=> Si on a 1000 samples dans le dataset, et un batch_size de 100 alors une epoch est 10 batches de 100 samples.
