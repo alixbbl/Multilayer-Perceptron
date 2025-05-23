@@ -14,7 +14,7 @@ class Activation_Sigmoid:
         self.outputs = np.where(inputs >= 0, 1 / (1 + np.exp(-inputs)), np.exp(inputs) / (1 + np.exp(inputs)))
 
 # pour la output layer => demande de la consigne
-class Activation_SoftMax():
+class Activation_SoftMax:
     def activate(self, inputs):
         exp_values = np.exp(inputs - np.max(inputs, axis=-1, keepdims=True))
         probabilities = exp_values / np.sum(exp_values, axis=-1, keepdims=True)

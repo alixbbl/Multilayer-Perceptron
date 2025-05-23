@@ -16,23 +16,27 @@ def main(parsed_args):
     y_train = X_train['Diagnosis']
     X_train.drop(columns='Diagnosis', inplace=True)
     n_inputs = X_train.shape[1]
-    hidden_layers = parsed_args.hidden_layers
-    mlp = MLP(n_inputs, hidden_layers, n_output=2) # deux neurones en sortie car on utilisera SoftMax pour obtenir des % et pas juste 0 ou 1
-
-    mlp.train(
-                X_train, 
-                y_train,
-                parsed_args.epochs,
-                parsed_args.loss,
-                parsed_args.batch_size,
-                parsed_args.learning_rate
-            )
+    hidden_layers = parsed_args.layers
+    n_output = 2 if parsed_args.loss == "categoricalCrossEntropy" else 1
+    mlp = MLP(n_inputs, 
+                hidden_layers, 
+                n_output=n_output, 
+                loss=parsed_args.loss, 
+                learning_rate=parsed_args.learning_rate
+    )
+    print(mlp)
+    # mlp.train(
+    #             X_train, 
+    #             y_train,
+    #             parsed_args.epochs,
+    #             parsed_args.batch_size
+    # )
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--hidden_layers", 
+    parser.add_argument("--layers", 
                         type=int, 
-                        nargs="2+",  # accepte un ou plusieurs entiers
+                        nargs="+",  # accepte un ou plusieurs entiers
                         required=True,
                         help="Number of neurons in each hidden layer. Ex: --hidden_layers 24 24 24."
                         )
@@ -45,8 +49,8 @@ if __name__ == "__main__":
                         type=str,
                         required=True,
                         choices=("binaryCrossEntropy",
-                                 "categoricalCrossentropy"),
-                        help="Please enter a valid loss method : binaryCrossEntropy or categoricalCrossentropy"
+                                 "categoricalCrossEntropy"),
+                        help="Please enter a valid loss method : binaryCrossEntropy or categoricalCrossEntropy"
                         )
     parser.add_argument("--batch_size",
                         type=int,

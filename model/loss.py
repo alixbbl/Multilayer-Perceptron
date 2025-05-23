@@ -23,6 +23,13 @@ class Loss_BinaryCrossEntropy(Loss):
         loss = - (y_true * np.log(y_pred_clipped) + (1 - y_true) * np.log(1 - y_pred_clipped))
         return loss
 
+    def compute_gradient(self, y_pred, y_true): # gradient est la derivee de la fonction de perte
+        m = y_true.shape[0]
+        y_pred_clipped = np.clip(y_pred, 1e-7, 1-1e-7)
+        grad = (-(y_true / y_pred_clipped - (1 - y_true) / (1 - y_pred_clipped))) / m
+        return grad
+
+
 class Loss_CategoricalCrossEntropy(Loss):
     
     def compute_loss(self, y_pred, y_true):
@@ -36,3 +43,9 @@ class Loss_CategoricalCrossEntropy(Loss):
             correct_confidences = np.sum(y_pred_clipped*y_true, axis=1)
         negative_likelihoods = -np.log(correct_confidences)
         return negative_likelihoods
+
+    def compute_gradient(self, y_pred, y_true):
+        m = y_true.shape[0]
+        y_pred_clipped = np.clip(y_pred, 1e-7, 1-1e-7)
+        grad = (y_pred_clipped - y_true) / m
+        return grad
