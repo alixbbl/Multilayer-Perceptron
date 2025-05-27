@@ -7,7 +7,7 @@ from data_processing.utils import upload_csv, display_correlation_matrix, write_
 from typing import List, Dict, Tuple
 from constants import FULL, RELEVANT, COLUMNS_NAMES, INDEX_NAME
 from constants import TEST_TRAIN_SPLIT_PARAMS, TARGET
-from constants import OUTPUT_FILENAMES
+from constants import OUTPUT_FILENAMES, DATA_DIR
 
 class dataProcesser():
     
@@ -23,7 +23,7 @@ class dataProcesser():
     
     def ft_set_index(self):
         """
-        Setting index according to constants file.
+            Setting index according to constants file.
         """
         self.clean_df = self.dataframe.copy()
         self.clean_df.columns = COLUMNS_NAMES
@@ -31,7 +31,7 @@ class dataProcesser():
 
     def ft_imputation(self):
         """
-        Imputation by mean if some null entries are found in the dataset.
+            Imputation by mean if some null entries are found in the dataset.
         """
         total_null = 0
         for column in self.clean_df.columns:
@@ -49,7 +49,7 @@ class dataProcesser():
 
     def ft_visualize_data(self)-> None:
         """
-        This functions helps visualize and understand the use of data, after printing a correlation matrix.
+            This functions helps visualize and understand the use of data, after printing a correlation matrix.
         """
         while True:
             visu_choice = input("Enter a data visualization mode 'FULL' or 'RELEVANT':\n ")
@@ -64,7 +64,7 @@ class dataProcesser():
 
     def ft_select_relevant_features(self):
         """
-        This function uses the correlation matrix to select the non-correlated then relevant features of the dataset.
+            This function uses the correlation matrix to select the non-correlated then relevant features of the dataset.
         """
         data_num = self.clean_df.select_dtypes(include=['int', 'float'])
         if 'Index' in data_num.columns:
@@ -84,26 +84,24 @@ class dataProcesser():
         print(f"These are the features relevant for training phase :\n {self.relevant_features}")
 
     # Utilisation de apply() qui permet de calculer colonne a colonne sans boucle for
-    def ft_standardize_data(self, df: pd.DataFrame) -> Tuple[pd.Series, pd.Series, pd.DataFrame]:
-        """"
-        This functions takes a matrix and returns a tuple of calculated elements : 
-        the matrix std and mean, and the standardized matrix to operate. 
+    def ft_standardize_data(self, df: pd.DataFrame) -> tuple:
         """
-        df_std = df.std() # on applique la fonction a chaque colonne et retourne une Serie des std de chaque colonne
-        df_mean = df.mean() # idem avec les moyennes de chaque col. apply() agir comme une boucle for
-        data_standardized = (df - df_mean) / df_std
-        return (df_std, df_mean, data_standardized)
+            Standardizes the dataframe and returns:
+            - standardized dataframe
+            - means (as a Series)
+            - stds (as a Series)
+        """
+        mean_vector = df.mean()
+        std_vector = df.std()
+        df_standardized = (df - mean_vector) / std_vector
+        return df_standardized, mean_vector, std_vector
     
     def ft_train_test_split(self, y_feat: str) -> None:
-        """
-        This function splits the relevant dataset into two unequal parts used for training and testing the model.
-        Works randomly. Saves Xy_train and Xy_test dataframes as CSV files.
-        """
+        
         dataset = self.clean_df[self.relevant_features]
-
         np.random.seed(self.random_state)
         data_size = len(dataset)
-        test_size = int(data_size * self.test_size) # on recupere 25% de la data globale pour le data de test
+        test_size = int(data_size * self.test_size)
 
         if self.shuffle:
             indices = np.random.permutation(data_size)
@@ -112,21 +110,23 @@ class dataProcesser():
 
         test_indices = indices[:test_size]
         train_indices = indices[test_size:]
-        Xy_train = dataset.iloc[train_indices, :-1]
-        Xy_test = dataset.iloc[test_indices, :-1]
+        Xy_train = dataset.iloc[train_indices]
+        Xy_test = dataset.iloc[test_indices]
 
-        Xy_train_target = Xy_train["Diagnosis"]
-        Xy_train.drop('Diagnosis', axis=1, inplace=True) 
-        Xy_train_std, Xy_train_mean, Xy_train_stand = self.ft_standardize_data(Xy_train)
-        Xy_train_stand = pd.concat([Xy_train, Xy_train_target], axis=1, ignore_index=False)
+        X_train = Xy_train.drop(columns=[y_feat])
+        y_train = Xy_train[y_feat]
+        X_train_std, mean_vec, std_vec = self.ft_standardize_data(X_train)
+        Xy_train_std = X_train_std.copy()
+        Xy_train_std[y_feat] = y_train.values
         standard_const_df = pd.DataFrame({
-                                            "Mean": Xy_train_mean,
-                                            "Std": Xy_train_std
-        })
-        write_output_dataset(standard_const_df, "constants_stand.csv")
-        write_output_dataset(Xy_train_stand, OUTPUT_FILENAMES[0])
-        write_output_dataset(Xy_test, OUTPUT_FILENAMES[1])
-        
+                                            "Mean": mean_vec,
+                                            "Std": std_vec
+                                        })
+
+        write_output_dataset(standard_const_df, "constants_stand.csv", DATA_DIR)
+        write_output_dataset(Xy_train_std, OUTPUT_FILENAMES[0], DATA_DIR)
+        write_output_dataset(Xy_test, OUTPUT_FILENAMES[1], DATA_DIR)
+
         print("Data has been split and saved in Xy_train.csv and Xy_test.csv.")
 
 

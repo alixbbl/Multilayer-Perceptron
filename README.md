@@ -9,6 +9,9 @@
 Depuis la racine du projet.
 `python -m data_processing.process_data`
 
+👉 POUR LANCER LA TRAINING :
+`python train_MLP.py --layer 24 24 24 --epochs 1 --loss categoricalCrossentropy --batch_size 8 --learning_rate 0.0314`
+
 ## Definition et concepts-clefs
 
 Un multilayer perceptron est un reseau de neurones artificiel possedant au moins trois couches :

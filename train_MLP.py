@@ -17,20 +17,19 @@ def main(parsed_args):
     X_train.drop(columns='Diagnosis', inplace=True)
     n_inputs = X_train.shape[1]
     hidden_layers = parsed_args.layers
-    n_output = 2 if parsed_args.loss == "categoricalCrossEntropy" else 1
+    n_output = 2 if parsed_args.loss == "categoricalCrossentropy" else 1
     mlp = MLP(n_inputs, 
                 hidden_layers, 
                 n_output=n_output, 
                 loss=parsed_args.loss, 
                 learning_rate=parsed_args.learning_rate
     )
-    print(mlp)
-    # mlp.train(
-    #             X_train, 
-    #             y_train,
-    #             parsed_args.epochs,
-    #             parsed_args.batch_size
-    # )
+    loss_history = mlp.train(
+                X_train, 
+                y_train,
+                parsed_args.epochs,
+                parsed_args.batch_size
+    )
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -48,9 +47,9 @@ if __name__ == "__main__":
     parser.add_argument("--loss",
                         type=str,
                         required=True,
-                        choices=("binaryCrossEntropy",
-                                 "categoricalCrossEntropy"),
-                        help="Please enter a valid loss method : binaryCrossEntropy or categoricalCrossEntropy"
+                        choices=("binaryCrossentropy",
+                                 "categoricalCrossentropy"),
+                        help="Please enter a valid loss method : binaryCrossentropy or categoricalCrossentropy"
                         )
     parser.add_argument("--batch_size",
                         type=int,

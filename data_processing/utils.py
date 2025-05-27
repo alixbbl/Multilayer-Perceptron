@@ -4,7 +4,7 @@ import pandas as pd
 import seaborn as sns
 from typing import List, Dict, Tuple
 import matplotlib.pyplot as plt
-# from constants 
+
 
 def upload_csv(filepath: str) -> pd.DataFrame:
     """
@@ -40,11 +40,11 @@ def display_correlation_matrix(data: pd.DataFrame)-> None:
     plt.title('Correlation Matrix')
     plt.show()
 
-def write_output_dataset(dataset: pd.DataFrame, filename: str)-> None:
+def write_output_dataset(dataset: pd.DataFrame, filename: str, directory_path: str)-> None:
     """
     This function writes a Dataset into a CSV file.
     """
-    output_file = filename
-    with open(output_file, mode='w', newline='') as file:
-        dataset.to_csv(filename, index=False)
-    print(f"{output_file} is printed!")
+    output_path = directory_path / filename
+    with open(output_path, mode='w', newline='') as file:
+        dataset.to_csv(output_path, index=False)
+    print(f"{filename} is printed!")
