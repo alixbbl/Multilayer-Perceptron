@@ -33,7 +33,7 @@ def main(parsed_args):
                 parsed_args.batch_size
     )
     plot_loss(loss_history)
-    print(accuracy_history)
+    plot_accuracy(accuracy_history)
     mlp.save_parameters(constants.MODEL_PARAMETERS)
 
 if __name__ == "__main__":

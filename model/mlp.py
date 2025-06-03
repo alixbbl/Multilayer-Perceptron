@@ -14,22 +14,20 @@ def target_encoder(y, categorical=False):
     - Binary: 'B'->0, 'M'->1
     - Categorical: one-hot encoding
     """
-    if isinstance(y, np.ndarray) and np.issubdtype(y.dtype, np.integer):
-        if categorical and y.max() == 1:  # déjà binaire, convertir en one-hot
-            one_hot = np.zeros((len(y), 2))
-            one_hot[np.arange(len(y)), y] = 1
-            return one_hot
-        return y
-    
-    mapping = {'B': 0, 'M': 1}
-    y_encoded = pd.Series(y).map(mapping).values
+    if isinstance(y, pd.Series):
+        y = y.values
+    if isinstance(y[0], str):
+        mapping = {'B': 0, 'M': 1}
+        y_encoded = pd.Series(y).map(mapping).values
+    else:
+        y_encoded = y
 
     if categorical:
         one_hot = np.zeros((len(y_encoded), 2))
-        one_hot[np.arange(len(y_encoded)), y_encoded] = 1
+        one_hot[np.arange(len(y_encoded)), y_encoded.astype(int)] = 1
         return one_hot
-    
-    return y_encoded
+    return y_encoded.astype(int)
+
 
 def data_loader(X: pd.DataFrame, y: np.ndarray, batch_size: int):
     """Data loader with shuffling"""
@@ -109,7 +107,6 @@ class MLP:
 
 
     def train(self, X_train, y_train, epochs, batch_size):
-        # Encodage correct selon le type de loss
         categorical = (self.loss_type == "categoricalCrossentropy")
         y_train_encoded = target_encoder(y_train, categorical=categorical)
         loss_history = []
@@ -132,6 +129,8 @@ class MLP:
             epoch_accuracy = np.mean(y_pred_train == y_true_binary)
             accuracy_history.append(epoch_accuracy)
             
+            y_pred_proba = self.feed_forward(X_train.values[:100])  # Les 100 premiers
+            print(f"Prédictions: min={y_pred_proba.min():.4f}, max={y_pred_proba.max():.4f}, mean={y_pred_proba.mean():.4f}")
             print(f"Epoch {epoch+1}/{epochs} - Loss: {epoch_loss:.4f} - Accuracy: {epoch_accuracy:.4f}")
 
         return loss_history, accuracy_history
