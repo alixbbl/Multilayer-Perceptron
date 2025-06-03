@@ -13,7 +13,6 @@ def print_network_structure(mlp_network, width=120):
     print(empty_line)
     print(border)
 
-
 def upload_csv(filepath: str) -> pd.DataFrame:
     """
     This function loads a CSV file from the given path and returns a DataFrame.
@@ -32,3 +31,11 @@ def upload_csv(filepath: str) -> pd.DataFrame:
         raise ValueError("Error parsing the CSV file. Check its format.")
     except Exception as e:
         raise RuntimeError(f"An unexpected error occurred: {e}")
+
+# MODIFIER LA FONCTION POUR SAUVEGARDER LES WEIGHTS APPRIS
+def save_model_weights(weights: list, feature_names: list):
+    """
+        Save model weights and parameters for the prediction phase.
+    """    
+    print(feature_names)
+    # utiliser np.save() pour print les poids sous forme de tableau 

@@ -2,3 +2,8 @@ env/
 __pycache__
 /data_processing/__pycache__
 output/
+data/Xy_train.csv
+data/Xy_validation.csv
+data/constants_stands.csv
+visualization/Model_loss_history.png
+visualization/Model_loss_accuracy.png

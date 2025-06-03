@@ -1,8 +1,11 @@
 from pathlib import Path
 
 DATA_DIR = Path("data")
-OUTPUT_DIR = Path("output")
+MODEL_DIR = Path("model")
+VISU_DIR = Path("visualization")
 XY_TRAIN_PATH = DATA_DIR / "Xy_train.csv"
+XY_VALIDATION_PATH = DATA_DIR / "Xy_validation.csv"
+MODEL_PARAMETERS = MODEL_DIR / "model_parameters."
 
 FULL = "FULL"
 RELEVANT = "RELEVANT"
@@ -62,5 +65,5 @@ TEST_TRAIN_SPLIT_PARAMS = {
 
 OUTPUT_FILENAMES = [
                 "Xy_train.csv",
-                "Xy_test.csv",
+                "Xy_validation.csv",
 ]

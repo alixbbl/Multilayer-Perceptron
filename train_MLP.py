@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-from model.utils import upload_csv
+from model.utils import upload_csv, save_model_weights
+from visualization.plot import plot_loss, plot_accuracy
 import argparse
 from model.mlp import MLP
 import constants
@@ -18,18 +19,22 @@ def main(parsed_args):
     n_inputs = X_train.shape[1]
     hidden_layers = parsed_args.layers
     n_output = 2 if parsed_args.loss == "categoricalCrossentropy" else 1
+
     mlp = MLP(n_inputs, 
                 hidden_layers, 
                 n_output=n_output, 
                 loss=parsed_args.loss, 
                 learning_rate=parsed_args.learning_rate
     )
-    loss_history = mlp.train(
+    loss_history, accuracy_history = mlp.train(
                 X_train, 
                 y_train,
                 parsed_args.epochs,
                 parsed_args.batch_size
     )
+    plot_loss(loss_history)
+    print(accuracy_history)
+    mlp.save_parameters(constants.MODEL_PARAMETERS)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

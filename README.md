@@ -190,3 +190,15 @@ En pseudo-code simplifie on aurait ceci :
 Une epoch correspond a un passage complet du dataset de train dans le reseau. 
 On va diviser le dataset de training en unites dites "batchs".
 => Si on a 1000 samples dans le dataset, et un batch_size de 100 alors une epoch est 10 batches de 100 samples.
+
+La difficulte est de suivre et decomposer les etapes classiques de la backpropagation : 
+Forward pass → calcul de toutes les sorties (z, a) avec a les outputs actives
+
+Backward pass → on remonte les dérivées avec la chaîne :
+
+- dLoss/da
+- dLoss/dz
+- dLoss/dW
+
+En effet, dans un MLP, le calcul direct de dLoss/dW n'est pas possible, on doit donc decomposer le calcul
+pour arriver vers dW et donc les poids ajustes.
