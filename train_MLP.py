@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from model.utils import upload_csv, save_model_weights
+from model.utils import upload_csv
 from visualization.plot import plot_loss, plot_accuracy
 import argparse
 from model.mlp import MLP

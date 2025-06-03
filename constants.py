@@ -5,7 +5,10 @@ MODEL_DIR = Path("model")
 VISU_DIR = Path("visualization")
 XY_TRAIN_PATH = DATA_DIR / "Xy_train.csv"
 XY_VALIDATION_PATH = DATA_DIR / "Xy_validation.csv"
-MODEL_PARAMETERS = MODEL_DIR / "model_parameters."
+STAND_CONSTANTS = "constants_stand.csv"
+OUTPUT = "/output/"
+NETWORK_MLP = OUTPUT / "network_structure.csv"
+MODEL_PARAMETERS = MODEL_DIR / OUTPUT / "model_parameters"
 
 FULL = "FULL"
 RELEVANT = "RELEVANT"

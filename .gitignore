@@ -1,9 +1,14 @@
 env/
+
 __pycache__
 /data_processing/__pycache__
-output/
+
+model/output/*
+
 data/Xy_train.csv
 data/Xy_validation.csv
-data/constants_stands.csv
+data/constants_stand.csv
+data/X_val_std.csv
+
 visualization/Model_loss_history.png
 visualization/Model_loss_accuracy.png

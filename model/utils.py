@@ -1,17 +1,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
-def print_network_structure(mlp_network, width=120):
-    border = "*" * width
-    empty_line = "*" + " " * (width - 2) + "*"
-    message = f"You are building a network with these layers : {mlp_network}"
-    centered_message = "* " + message.center(width - 4) + " *"
-    print(border)
-    print(empty_line)
-    print(centered_message)
-    print(empty_line)
-    print(border)
+from typing import List
+import csv
+import constants
 
 def upload_csv(filepath: str) -> pd.DataFrame:
     """
@@ -32,10 +24,23 @@ def upload_csv(filepath: str) -> pd.DataFrame:
     except Exception as e:
         raise RuntimeError(f"An unexpected error occurred: {e}")
 
-# MODIFIER LA FONCTION POUR SAUVEGARDER LES WEIGHTS APPRIS
-def save_model_weights(weights: list, feature_names: list):
-    """
-        Save model weights and parameters for the prediction phase.
-    """    
-    print(feature_names)
-    # utiliser np.save() pour print les poids sous forme de tableau 
+
+def print_network_structure(mlp_network, width=120):
+    border = "*" * width
+    empty_line = "*" + " " * (width - 2) + "*"
+    message = f"You are building a network with these layers : {mlp_network}"
+    centered_message = "* " + message.center(width - 4) + " *"
+    print(border)
+    print(empty_line)
+    print(centered_message)
+    print(empty_line)
+    print(border)
+
+
+def save_config(mlp_network: List[int], loss: str, learning_rate: float, path=constants.MODEL_DIR / "network_structure.csv") -> None:
+    
+    with open(path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["mlp_network", "loss", "learning_rate"])
+        writer.writerow([str(mlp_network), loss, learning_rate])
+
