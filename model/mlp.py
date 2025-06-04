@@ -80,9 +80,10 @@ class MLP:
             inputs = layer.forward(inputs)
         return inputs
 
-    def backward_propagation(self, y_pred_batch, y_batch):
+    def backward_propagation(self, y_pred_batch: np.ndarray, y_batch: np.ndarray) -> None:
         """
-
+            Feed the model backward to adjust the weights and biases og the different layers,
+            based on the gradients ratio : dL/dW into .... COMPLETER.
         """
         # on recupere le gradient de la loss par rapports aux predictions dL/doutputs
         grad_dOutputs = self.loss_function.compute_loss_gradient(y_pred_batch, y_batch)

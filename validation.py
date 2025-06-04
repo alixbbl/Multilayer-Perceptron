@@ -70,7 +70,7 @@ def main():
     learning_rate = network_infra['learning_rate']
     mlp = MLP(mlp_network[0], mlp_network[1:-1], mlp_network[-1], loss, learning_rate)
 
-    load_weights_into_MLP(mlp, filepath=MODEL_DIR / "model_parameters.npz")
+    load_weights_into_MLP(mlp, filepath=constants.MODEL_PARAMETERS)
     
     # Lancement des predictions et test accuracy
     y_pred = mlp.predict(X_val_stand)

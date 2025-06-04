@@ -26,6 +26,7 @@ def upload_csv(filepath: str) -> pd.DataFrame:
 
 
 def print_network_structure(mlp_network, width=120):
+
     border = "*" * width
     empty_line = "*" + " " * (width - 2) + "*"
     message = f"You are building a network with these layers : {mlp_network}"
@@ -37,7 +38,7 @@ def print_network_structure(mlp_network, width=120):
     print(border)
 
 
-def save_config(mlp_network: List[int], loss: str, learning_rate: float, path=constants.MODEL_DIR / "network_structure.csv") -> None:
+def save_config(mlp_network: List[int], loss: str, learning_rate: float, path=constants.MODEL_DIR / "output/network_structure.csv") -> None:
     
     with open(path, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
