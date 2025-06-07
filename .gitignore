@@ -12,3 +12,4 @@ data/X_val_std.csv
 
 visualization/Model_loss_history.png
 visualization/Model_loss_accuracy.png
+visualization/Model_training_accuracy_history.png

@@ -41,8 +41,8 @@ def load_weights_into_MLP(mlp, filepath):
     """
     with np.load(filepath) as data:
         for i, layer in enumerate(mlp.layers):
-            print(f'For layer {i} : weights are {data[f'layer_{i}_weights']}')
-            print(f'For layer {i} : biases are {data[f'layer_{i}_biases']}')
+            # print(f'For layer {i} : weights are {data[f'layer_{i}_weights']}')
+            # print(f'For layer {i} : biases are {data[f'layer_{i}_biases']}')
             layer.weights = data[f'layer_{i}_weights']
             layer.biases = data[f'layer_{i}_biases']
 
