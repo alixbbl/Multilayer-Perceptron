@@ -1,0 +1,7 @@
+README.md
+setup.py
+src/mlp.egg-info/PKG-INFO
+src/mlp.egg-info/SOURCES.txt
+src/mlp.egg-info/dependency_links.txt
+src/mlp.egg-info/requires.txt
+src/mlp.egg-info/top_level.txt
