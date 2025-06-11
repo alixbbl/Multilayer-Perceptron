@@ -13,7 +13,7 @@ pip install -e .
 Commandes scripts :
 ```bash
 python scripts/process_data.py --path_csv_to_read data/data.csv --select_features three
-python scripts/train.py --layer 24 24 24 --epochs 84 --loss binaryCrossentropy --batch_size 32 --learning_rate 0.0314
+python scripts/train.py --layer 24 24 24 --epochs 20 --loss binaryCrossentropy --batch_size 32 --learning_rate 0.0314
 python scripts/validate.py
 ```
 ---

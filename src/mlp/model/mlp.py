@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from typing import List
 from .layer import DenseLayer
-from .optimizer import Optimizer
+from .optimizer import SGD_optimizer
 from .loss import Loss_BinaryCrossEntropy, Loss_CategoricalCrossEntropy
 from .utils import print_network_structure, save_config
 from .early_stopper import Early_Stopper
@@ -33,12 +33,12 @@ def target_encoder(y, categorical=False):
 class MLP:
     
     def __init__(self, n_inputs: int, n_neurons: List, n_output: int, loss, learning_rate):
+        
         mlp_network = [n_inputs] + n_neurons + [n_output]
         print_network_structure(mlp_network)
-        MODEL_OUTPUT.mkdir(parents=True, exist_ok=True)
         save_config(mlp_network, loss, learning_rate)
         
-        self.optimizer = Optimizer(learning_rate)
+        self.optimizer = SGD_optimizer(learning_rate) # modifier en fonction du choix 
         self.n_inputs = n_inputs
         self.n_output = n_output
         self.learning_rate = learning_rate
@@ -47,7 +47,7 @@ class MLP:
         if loss == "categoricalCrossentropy" :
             self.loss_function = Loss_CategoricalCrossEntropy()
         else:
-            self.loss_function = Loss_BinaryCrossEntropy(class_weight_0=1.0, class_weight_1=1.0)
+            self.loss_function = Loss_BinaryCrossEntropy()
 
         self.layers = []
         for i in range(len(mlp_network) - 1):
@@ -58,17 +58,27 @@ class MLP:
             new_layer = DenseLayer(mlp_network[i], mlp_network[i + 1], activation)
             self.layers.append(new_layer)
 
-    def feed_forward(self, X_batch: np.ndarray) -> np.ndarray:
+    def _feed_forward(self, X_batch: np.ndarray) -> np.ndarray:
         """
-        Calculate the outputs of every layer based of the outputs of the previous ones.
+            Calculate the outputs of every layer based of the outputs of the previous ones.
         """
         inputs = X_batch
         for layer in self.layers:
             inputs = layer.forward(inputs)
         return inputs
 
-    def backward_propagation(self, y_pred_batch: np.ndarray, y_batch: np.ndarray) -> None:
-
+    def _update_weights(self):
+        """
+            Update weights using chosen optimizer.
+        """
+        for layer in self.layers:
+            self.optimizer.update_weights(layer)
+    
+    def _backward_propagation(self, y_pred_batch: np.ndarray, y_batch: np.ndarray) -> None:
+        """
+            Compute gradients via backpropagation.
+            Includes gradient clipping (max norm=5.0) to prevent exploding gradients.
+        """
         grad_dOutputs = self.loss_function.compute_loss_gradient(y_pred_batch, y_batch)
         
         for layer in reversed(self.layers):
@@ -84,8 +94,6 @@ class MLP:
             if grad_norm > max_gradient_norm:
                 layer.dBiases = layer.dBiases * (max_gradient_norm / grad_norm)
 
-            layer.weights -= self.optimizer.learning_rate * layer.dWeights
-            layer.biases -= self.optimizer.learning_rate * layer.dBiases
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -93,7 +101,7 @@ class MLP:
             These predictions are always biaised, so training accuracy cannot be an 
             reliable performance indicator.
         """
-        y_pred = self.feed_forward(X)
+        y_pred = self._feed_forward(X)
         if self.loss_type == "categoricalCrossentropy":
             return np.argmax(y_pred, axis=1)
         else:
@@ -129,14 +137,15 @@ class MLP:
                 X_batch = X_train_array[start:end]
                 y_batch = y_train_encoded[start:end]
 
-                y_pred_batch = self.feed_forward(X_batch)
+                y_pred_batch = self._feed_forward(X_batch)
                 loss_batch = self.loss_function.calculate_final_loss(y_pred_batch, y_batch)
 
                 batch_size_actual = len(X_batch)
                 total_loss += loss_batch * batch_size_actual
                 total_samples += batch_size_actual
 
-                self.backward_propagation(y_pred_batch, y_batch)
+                self._backward_propagation(y_pred_batch, y_batch)
+                self._update_weights()
 
             epoch_loss = total_loss / total_samples
             loss_history.append(epoch_loss)

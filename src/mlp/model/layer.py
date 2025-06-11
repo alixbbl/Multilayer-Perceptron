@@ -28,14 +28,16 @@ class DenseLayer:
         self.outputs = self.activation.activate(self.z)
         return self.outputs
 
-    def backward(self, grad_dOutputs: np.ndarray) -> np.ndarray:
+    def backward(self, grad_from_next: np.ndarray) -> np.ndarray:
+        
         if isinstance(self.activation, Activation_SoftMax):
-            grad_activation = grad_dOutputs
+            grad_activation = grad_from_next
         else:
-            grad_activation = grad_dOutputs * self.activation.derivative(self.z)
+            grad_activation = grad_from_next * self.activation.derivative(self.z)
         
         self.dWeights = np.dot(self.inputs.T, grad_activation)
         self.dBiases = np.sum(grad_activation, axis=0, keepdims=True)
         
         self.dInputs = np.dot(grad_activation, self.weights.T)
+        
         return self.dInputs
