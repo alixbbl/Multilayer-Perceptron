@@ -8,25 +8,24 @@ from .utils import print_network_structure, save_config
 from .early_stopper import Early_Stopper
 from mlp.config import MODEL_OUTPUT
 
-def target_encoder(y, categorical=False):
+def target_encoder(y, categorical=False)->np.ndarray:
     """
-        Converts labels: 
-        - Binary: 'B'->0, 'M'->1
-        - Categorical: one-hot encoding
+        Convert labels: Binary 'B'->0, 'M'->1 or categorical one-hot.
     """
-    if isinstance(y, pd.Series):
-        y = y.values
-    if isinstance(y[0], str):
+    if not isinstance(y, pd.Series):
+        y = pd.Series(y)
+    if isinstance(y.iloc[0], str):
         mapping = {'B': 0, 'M': 1}
-        y_encoded = pd.Series(y).map(mapping).values
+        y_encoded = y.map(mapping).values
     else:
-        y_encoded = y
+        y_encoded = y.values
+
     if categorical:
         one_hot = np.zeros((len(y_encoded), 2))
         one_hot[np.arange(len(y_encoded)), y_encoded.astype(int)] = 1
         return one_hot
-    return y_encoded.astype(int)
 
+    return y_encoded
 
 # ****************************************** MULTILAYER PERCEPTRON *****************************************
 
@@ -107,7 +106,7 @@ class MLP:
         else:
             return (y_pred >= 0.5).astype(int).flatten()
 
-    def save_parameters(self, filepath):
+    def save_parameters(self, filepath: str):
         """"
             Save the MLP weights and biases into a NPZ file.
         """
@@ -118,20 +117,23 @@ class MLP:
         np.savez(filepath, **params)
 
 
-    def train(self, X_train, y_train, epochs, batch_size):
+    def train(self, X_train: pd.DataFrame, y_train: pd.Series, epochs: int, batch_size: int):
         """
-        Train the model accordingly to the parameters.
+            Train the model accordingly to the parameters.
         """
         categorical = (self.loss_type == "categoricalCrossentropy")
         y_train_encoded = target_encoder(y_train, categorical=categorical)
+        y_true_binary = target_encoder(y_train, categorical=False)
+        X_train_array = X_train.values
         loss_history = []
         accuracy_history = []
+        early_stopper = Early_Stopper()   
         
         for epoch in range(epochs):
+
             total_loss = 0
             total_samples = 0
-            X_train_array = X_train.values if hasattr(X_train, 'values') else X_train
-            
+ 
             for start in range(0, len(X_train_array), batch_size):
                 end = min(start + batch_size, len(X_train_array))
                 X_batch = X_train_array[start:end]
@@ -151,11 +153,15 @@ class MLP:
             loss_history.append(epoch_loss)
             
             y_pred_train = self.predict(X_train_array)
-            y_true_binary = target_encoder(y_train, categorical=False)
+            
             epoch_accuracy = np.mean(y_pred_train == y_true_binary)
             accuracy_history.append(epoch_accuracy)
+            should_stop = early_stopper(epoch_loss)
             
-            if epoch % 10 == 0:
+            if epoch % 3 == 0:
                 print(f"Epoch {epoch+1}/{epochs} - Loss: {epoch_loss:.4f} - Accuracy: {epoch_accuracy:.4f}")
-        
+            if should_stop:
+                print(f"🛑 Early stopping at epoch {epoch+1} (patience={early_stopper.patience})")
+                break
+
         return loss_history, accuracy_history

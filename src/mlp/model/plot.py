@@ -21,4 +21,4 @@ def plot_accuracy(accuracy_history: list):
     plt.grid(True)
     filepath = VISU_OUTPUT / f'Model_training_accuracy_history.png'
     plt.savefig(filepath)
-    # plt.show()
+    plt.show()

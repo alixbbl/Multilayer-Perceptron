@@ -1,6 +1,8 @@
+from mlp.config import EARLY_STOPPER
+
 class Early_Stopper:
     
-    def __init__(self, patience=50, delta=1e-4):
+    def __init__(self, patience=EARLY_STOPPER["patience"], delta=EARLY_STOPPER["delta"]):
         
         self.patience = patience
         self.delta = delta

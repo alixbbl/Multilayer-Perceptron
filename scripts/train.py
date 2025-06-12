@@ -11,6 +11,7 @@ def main(parsed_args):
     X_train = upload_csv(filepath=config.DATA_PROCESSING_OUTPUT / config.OUTPUT_FILENAMES[0])
     y_train = X_train['Diagnosis']
     X_train.drop(columns='Diagnosis', inplace=True)
+
     n_inputs = X_train.shape[1]
     hidden_layers = parsed_args.layers
     n_output = 2 if parsed_args.loss == "categoricalCrossentropy" else 1
@@ -62,12 +63,5 @@ if __name__ == "__main__":
                         default=0.0314,
                         help="Please enter a valid larning rate. Default = 0.0314."
                         )
-    # parser.add_argument("--optimizer",
-    #                     type=str,
-    #                     required=True,
-    #                     choices=("GD",
-    #                              "ADAM"),
-    #                     help="Please enter a valid optimizer name : ADAM or GD"
-    #                     )
     parsed_args = parser.parse_args()
     main(parsed_args)

@@ -12,20 +12,20 @@ class Metrics:
 
     def _calculate_accuracy(self) -> float:
         """
-        Calculate the accuracy of the model on test data : global perfomance.
-        (TP + TN) / Total
+            Calculate the accuracy of the model on test data : global perfomance.
+            (TP + TN) / Total
 
-        :param y_pred: Calculated predictions
-        :param y_true: True labels (Malignant or Benign)
-        :return: accuracy score (0-1)
+            :param y_pred: Calculated predictions
+            :param y_true: True labels (Malignant or Benign)
+            :return: accuracy score (0-1)
         """
         return (self.TP + self.TN) / (self.TP + self.FP + self.TN + self.FN)
 
     def _calculate_precision(self) -> float:
         """
-        Calculate the precision of the model on test data.
-        TP / (TP + FP)
-        :return: precision score (0-1)
+            Calculate the precision of the model on test data.
+            TP / (TP + FP)
+            :return: precision score (0-1)
         """
         if (self.TP + self.FP) == 0:
             return 0.0
@@ -33,9 +33,9 @@ class Metrics:
 
     def _calculate_recall(self) -> float:
         """
-        Calculate the recall of the model on test data.
-        TP / (TP + FN)
-        :return: recall score (0-1)
+            Calculate the recall of the model on test data.
+            TP / (TP + FN)
+            :return: recall score (0-1)
         """
         if (self.TP + self.FN) == 0:
             return 0.0
@@ -43,9 +43,9 @@ class Metrics:
 
     def _calculate_F1score(self) -> float:
         """
-        Calculate the F1 score of the model on test data.
-        f1 = 2 * (precision * recall) / (precision + recall)
-        :return: F1 score (0-1)
+            Calculate the F1 score of the model on test data.
+            f1 = 2 * (precision * recall) / (precision + recall)
+            :return: F1 score (0-1)
         """
         precision = self._calculate_precision()
         recall = self._calculate_recall()
@@ -55,7 +55,7 @@ class Metrics:
 
     def print_all_metrics(self):
         """
-        Print calculated metrics for the prediction phase.
+            Print calculated metrics for the prediction phase.
         """
         accuracy = self._calculate_accuracy()
         precision = self._calculate_precision()

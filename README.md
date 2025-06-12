@@ -12,8 +12,9 @@ pip install -e .
 
 Commandes scripts :
 ```bash
-python scripts/process_data.py --path_csv_to_read data/data.csv --select_features three
+python scripts/process_data.py --path_csv_to_read data/data.csv --select_features three / all / select
 python scripts/train.py --layer 24 24 24 --epochs 20 --loss binaryCrossentropy --batch_size 32 --learning_rate 0.0314
+python scripts/train.py --layer 12 8 --epochs 50 --loss categoricalCrossentropy --batch_size 32 --learning_rate 0.0314
 python scripts/validate.py
 ```
 ---
@@ -88,6 +89,12 @@ Input Layer (n_features) → Hidden Layer 1 → Hidden Layer 2 → Output Layer
 - **Hidden layers :** ReLU (`max(0, x)`)
 - **Output layer :** Softmax ou Sigmoid selon l'architecture
 
+#### Fonctions de cout (Loss)
+- **Binary Cross Entropy :** avec Sigmoid (1 neurone)
+- **Categorical Cross Entropy  :** avec Softmax (n neurones)
+
+Cf le second README dedie a l'implementation du MLP dans le dossier 'model'.
+
 ### 3️⃣ ENTRAÎNEMENT
 
 #### Forward Pass
@@ -152,3 +159,8 @@ Train: 60% → Test: 58%   (Les deux faibles = modèle trop simple)
 
 -**🎉 Situation idéale**
 Train: 92% → Test: 91%   (Très proche = bon modèle)
+
+Accuracy trop haute dès le début → Réduire la complexité
+Accuracy qui stagne → Augmenter la complexité
+Loss qui explose → Réduire learning rate
+Apprentissage trop lent → Augmenter learning rate

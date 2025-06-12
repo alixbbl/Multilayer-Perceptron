@@ -117,3 +117,14 @@ TEST_TRAIN_SPLIT_PARAMS = {
                 'shuffle': True,
 }
 
+OPTIMIZER = [
+                "SGD",
+                "ADAM",
+]
+
+EARLY_STOPPER = {
+                "patience" : 5,
+                "delta" : 1e-4,
+                "start_from_epoch" : 0,
+                "monitor" : "loss",
+}

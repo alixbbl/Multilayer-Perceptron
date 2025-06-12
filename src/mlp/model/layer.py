@@ -14,7 +14,7 @@ class DenseLayer:
             self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(2 / n_inputs) # He init
         elif activation == "Sigmoid":
             self.activation = Activation_Sigmoid()
-            self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(1 / n_inputs)
+            self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(1 / n_inputs) # Xavier Init
         elif activation == "SoftMax":
             self.activation = Activation_SoftMax()
             self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(1 / n_inputs) # Xavier Init
