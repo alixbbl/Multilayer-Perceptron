@@ -4,7 +4,6 @@ import ast
 
 import mlp.config as config
 from mlp.model.utils import upload_csv
-from mlp.model.plot import plot_loss
 from mlp.model.mlp import MLP
 from mlp.model.metrics import Metrics
 
@@ -49,7 +48,8 @@ def main():
     mlp_network = ast.literal_eval(network_infra["mlp_network"])
     loss = network_infra['loss']
     learning_rate = network_infra['learning_rate']
-    mlp = MLP(mlp_network[0], mlp_network[1:-1], mlp_network[-1], loss, learning_rate)
+    
+    mlp = MLP(mlp_network[0], mlp_network[1:-1], mlp_network[-1], loss, learning_rate, save_name="Validation")
 
     load_weights_into_MLP(mlp, filepath=config.MODEL_PARAMETERS)
     
