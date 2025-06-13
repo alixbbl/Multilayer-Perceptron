@@ -99,7 +99,7 @@ Cf le second README dedie a l'implementation du MLP dans le dossier 'model'.
 
 #### Forward Pass
 ```python
-z = W·X + b  # Combinaison linéaire
+z = W·X + b  # Calcul matriciel pour obtenir les predictions non activees
 a = activation(z)  # Activation
 ```
 

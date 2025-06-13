@@ -19,7 +19,7 @@ class Metrics:
             :param y_true: True labels (Malignant or Benign)
             :return: accuracy score (0-1)
         """
-        return (self.TP + self.TN) / (self.TP + self.FP + self.TN + self.FN)
+        return (self.TP + self.TN) / (self.TP + self.FP + self.TN + self.FN) # epoch_accuracy = np.mean(y_pred_train == y_true_binary)
 
     def _calculate_precision(self) -> float:
         """

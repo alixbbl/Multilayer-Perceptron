@@ -1,11 +1,13 @@
 import pandas as pd
 import numpy as np
+import json
 from typing import List
 from .layer import DenseLayer
 from .optimizer import SGD_optimizer
 from .loss import Loss_BinaryCrossEntropy, Loss_CategoricalCrossEntropy
 from .utils import print_network_structure, save_config
 from .early_stopper import Early_Stopper
+from .metrics import Metrics
 from mlp.config import MODEL_OUTPUT
 
 def target_encoder(y, categorical=False)->np.ndarray:
@@ -31,17 +33,21 @@ def target_encoder(y, categorical=False)->np.ndarray:
 
 class MLP:
     
-    def __init__(self, n_inputs: int, n_neurons: List, n_output: int, loss, learning_rate):
+    def __init__(self, n_inputs: int, n_neurons: List, 
+                 n_output: int, loss, learning_rate, 
+                 save_name):
         
         mlp_network = [n_inputs] + n_neurons + [n_output]
         print_network_structure(mlp_network)
         save_config(mlp_network, loss, learning_rate)
         
-        self.optimizer = SGD_optimizer(learning_rate) # modifier en fonction du choix 
+        self.optimizer = SGD_optimizer(learning_rate)
         self.n_inputs = n_inputs
         self.n_output = n_output
+        self.config = mlp_network
         self.learning_rate = learning_rate
         self.loss_type = loss
+        self.save_name = save_name
         
         if loss == "categoricalCrossentropy" :
             self.loss_function = Loss_CategoricalCrossEntropy()
@@ -106,18 +112,40 @@ class MLP:
         else:
             return (y_pred >= 0.5).astype(int).flatten()
 
-    def save_parameters(self, filepath: str):
+    def save_weights(self, filepath: str):
         """"
             Save the MLP weights and biases into a NPZ file.
         """
-        params = {}
+        weigths = {}
         for i, layer in enumerate(self.layers):
-            params[f'layer_{i}_weights'] = layer.weights
-            params[f'layer_{i}_biases'] = layer.biases
-        np.savez(filepath, **params)
+            weigths[f'layer_{i}_weights'] = layer.weights
+            weigths[f'layer_{i}_biases'] = layer.biases
+        np.savez(filepath, **weigths)
+
+    def save_training_params_into_JSON(self, 
+                                       save_name, 
+                                       loss_history, 
+                                       accuracy_history, 
+                                       recall_history, 
+                                       precision_history):
+        """"
+            Save the all MLP training scores into a JSON.
+        """
+        results = {
+            "model_name" : save_name,
+            "config" : self.config,
+            "learning_rate" : self.learning_rate,
+            "loss_history" : loss_history,
+            "accuracy_history" : accuracy_history,
+            "recall_history" : recall_history,
+            "precision_history" : precision_history,
+        }
+        with open(f'outputs/training_results_{save_name}.json', 'w') as f:
+            json.dump(results, f)
 
 
-    def train(self, X_train: pd.DataFrame, y_train: pd.Series, epochs: int, batch_size: int):
+    def train(self, X_train: pd.DataFrame, y_train: pd.Series, epochs: int, 
+              batch_size: int):
         """
             Train the model accordingly to the parameters.
         """
@@ -125,43 +153,66 @@ class MLP:
         y_train_encoded = target_encoder(y_train, categorical=categorical)
         y_true_binary = target_encoder(y_train, categorical=False)
         X_train_array = X_train.values
+        
         loss_history = []
         accuracy_history = []
-        early_stopper = Early_Stopper()   
+        recall_history = []
+        precision_history = []
+        
+        early_stopper = Early_Stopper()
         
         for epoch in range(epochs):
-
             total_loss = 0
             total_samples = 0
- 
+            
             for start in range(0, len(X_train_array), batch_size):
                 end = min(start + batch_size, len(X_train_array))
                 X_batch = X_train_array[start:end]
                 y_batch = y_train_encoded[start:end]
-
+                
                 y_pred_batch = self._feed_forward(X_batch)
                 loss_batch = self.loss_function.calculate_final_loss(y_pred_batch, y_batch)
-
+                
                 batch_size_actual = len(X_batch)
                 total_loss += loss_batch * batch_size_actual
                 total_samples += batch_size_actual
-
+                
                 self._backward_propagation(y_pred_batch, y_batch)
                 self._update_weights()
-
+            
             epoch_loss = total_loss / total_samples
             loss_history.append(epoch_loss)
             
             y_pred_train = self.predict(X_train_array)
+            metrics = Metrics(y_true_binary, y_pred_train)
             
-            epoch_accuracy = np.mean(y_pred_train == y_true_binary)
+            epoch_accuracy = metrics._calculate_accuracy()
+            epoch_precision = metrics._calculate_precision()
+            epoch_recall = metrics._calculate_recall()
+            
             accuracy_history.append(epoch_accuracy)
+            precision_history.append(epoch_precision)
+            recall_history.append(epoch_recall)
+            
             should_stop = early_stopper(epoch_loss)
             
             if epoch % 3 == 0:
-                print(f"Epoch {epoch+1}/{epochs} - Loss: {epoch_loss:.4f} - Accuracy: {epoch_accuracy:.4f}")
+                print(f"Epoch {epoch+1}/{epochs} - Loss: {epoch_loss:.4f} - "
+                    f"Accuracy: {epoch_accuracy:.4f} - Precision: {epoch_precision:.4f} - "
+                    f"Recall: {epoch_recall:.4f}")
+            
             if should_stop:
                 print(f"🛑 Early stopping at epoch {epoch+1} (patience={early_stopper.patience})")
                 break
-
-        return loss_history, accuracy_history
+        
+        if hasattr(self, 'save_name') and self.save_name:
+            self.save_training_params_into_JSON(
+                self.save_name, 
+                loss_history, 
+                accuracy_history, 
+                precision_history, 
+                recall_history
+            )
+        
+        return loss_history, accuracy_history,\
+                precision_history, recall_history

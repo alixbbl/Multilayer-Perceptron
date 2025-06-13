@@ -37,7 +37,7 @@ self.biases = np.zeros((1, n_neurons))
 ## 1. FONCTIONS DE LOSS
 
 ### Binary Cross Entropy (BCE)
-**Usage** : Classification binaire (2 classes)
+**Usage** : Classification binaire (2 classes et 1 seul neurone en sortie)
 
 **Formule** :
 ```
@@ -53,7 +53,7 @@ L = -[y·log(ŷ) + (1-y)·log(1-ŷ)]
 **Simplification avec Sigmoid** : `∂L/∂ŷ = ŷ - y`
 
 ### Categorical Cross Entropy (CCE)
-**Usage** : Classification multi-classes (n > 2 classes)
+**Usage** : Classification multi-classes (n > 2 classes, avec n neurones en sortie)
 
 **Formule** :
 ```

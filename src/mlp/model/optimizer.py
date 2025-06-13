@@ -16,8 +16,3 @@ class SGD_optimizer(Optimizer):
         layer.weights -= self.learning_rate * layer.dWeights
         layer.biases -= self.learning_rate * layer.dBiases
 
-
-class ADAM_optimizer(Optimizer):
-    
-    def update_weights(self):
-        pass
